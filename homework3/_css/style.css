@@ -1,13 +1,197 @@
 /* content */
+@import url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,700,500italic,900,700italic,900italic);
+
+* { font-family: 'Roboto', sans-serif; }
+
+html, body {
+	min-height:100%;
+}
+body {
+	background:#d5d5d5 url(../img/bg_test.jpg) no-repeat center center;
+	background-size: cover;
+}
+.backgrounds li {
+	position:fixed;
+	top:0;bottom: 0;
+	left:0; right: 0;
+	z-index:-1;
+	background:#d5d5d5 no-repeat center center;
+	background-size: cover;
+	opacity: 0;
+
+	webkit-transition: opacity 1s ease-in-out;
+	-moz-transition: opacity 1s ease-in-out;
+	-o-transition: opacity 1s ease-in-out;
+	transition: opacity 1s ease-in-out;
+}
+.backgrounds li.active {
+	opacity: 1;
+}
+
+ul, li {
+	margin:0;
+	padding:0;
+	list-style: none;
+	display: block;
+}
+
+h1 {
+	font-size: 4em;
+	font-weight: bold;
+	text-align: center;
+	color: #b3b3b3;
+	color: rgba(255, 255, 255, 0.8);
+	text-shadow: -1px -1px rgba(0, 0, 0, 0.5);
+	text-transform: uppercase;
+}
+
+#loader {
+	position: fixed;
+	top:0;
+	left:50%;
+	margin-left:-100px;
+	width:200px;
+	padding:0.7em 0 0.7em 2em;
+	font-size:0.7em;
+	color:#FFF;
+	text-align: center;
+	border-bottom-right-radius: 5px;
+	border-bottom-left-radius: 5px;
+	background: rgba(0,0,0,0.7) url(../img/ajax-loader.gif) no-repeat 2em center;
+	display: none;
+}
 
 #container {
-	margin: 40px auto;
-	overflow: hidden;
-	width: 800px;
+	margin: 0 auto;
+	width: 500px;
 }
 
 .column {
-	float: left;
-	width: 200px;
+
 }
 
+
+#todo-form input[type=text], #todo-list li {
+	padding:1em 1.5em;
+	border-radius:3px;
+}
+
+#todo-form {
+	position: relative;
+}
+#todo-form input {
+	font-size: 1em;
+	outline:0;
+	color:#FFF;
+	text-shadow:1px 1px 1px #000;
+}
+#todo-form input[type=text] {
+	display: block;
+	width:100%;
+	box-sizing:border-box;
+	border:none;
+	background:rgba(0,0,0,0.5);
+	-webkit-box-shadow: inset 0px 1px 2px rgba(0,0,0,0.7);
+	box-shadow: inset 0px 1px 2px rgba(0,0,0,0.7);
+	
+}
+#todo-form input[type=text]::-webkit-input-placeholder { /* WebKit browsers */
+    color:    #C4C4C4;
+}
+#todo-form input[type=text]:focus {
+	background:rgba(0,0,0,0.65);
+}
+#todo-form input[type=submit] {
+	display: block;
+	position: absolute;
+	right: 0.5rem;
+	top: 0;
+	background: transparent;
+	border: none;
+	vertical-align: middle;
+	font-size: 2.5em;
+	line-height: 1.1em;
+	color: rgba(255,255,255,0.8);
+	cursor: pointer;
+}
+#todo-form input[type=submit]:hover {
+	color:#FFF;
+}
+
+
+
+#todo-list li {
+	box-shadow:0 1px 2px #aaa;
+	background:white;
+	margin:1em 0;
+	
+	
+	transform-origin:top left;
+	position: relative;
+	z-index: 2;
+}
+
+#todo-list li.animate {
+	animation:fly-in-from-left .5s ease both;
+	-webkit-animation: fly-in-from-left .5s ease both;
+}
+#todo-list li.animate:nth-child(even){
+	animation-name:fly-in-from-right;
+	-webkit-animation-name: fly-in-from-right;
+	transform-origin:top right;
+}
+#todo-list li.removed {
+	animation:fly-out-to-left .5s ease both;
+	-webkit-animation: fly-out-to-left .5s ease both;
+}
+#todo-list li.removed:nth-child(even){
+	animation-name:fly-out-to-right;
+	-webkit-animation-name: fly-out-to-right;
+	transform-origin:top right;
+}
+#todo-list .todo-list-remove {
+	position:absolute;
+	font-size:.9rem;
+	top:0.5em;
+	right:0.5em;
+	border:thin solid gray;
+	color:gray;
+	width:1rem;
+	line-height:1rem;
+	text-align:center;
+	border-radius:50%;
+	text-decoration: none;
+	text-transform: uppercase;
+	cursor: pointer;
+}
+#todo-list .todo-list-remove:hover {
+	color:#df4d58;
+	border-color:#df4d58;
+}
+
+@keyframes fly-in-from-left {
+  from { transform:translateY(-15em) rotate(15deg); opacity:0; }
+}
+@-webkit-keyframes fly-in-from-left {
+  from { -webkit-transform:translateY(-15em) rotate(15deg); opacity:0; }
+}
+
+@keyframes fly-in-from-right {
+  from { transform:translateY(-15em) rotate(-15deg); opacity:0; }
+}
+@-webkit-keyframes fly-in-from-right {
+  from { -webkit-transform:translateY(-15em) rotate(-15deg); opacity:0; }
+}
+
+@keyframes fly-out-to-left {
+  to { transform:translateX(-100%); opacity:0; }
+}
+@-webkit-keyframes fly-out-to-left {
+  to { -webkit-transform:translateX(-100%); opacity:0; }
+}
+@keyframes fly-out-to-right {
+  to { transform:translateX(100%); opacity:0; }
+}
+@-webkit-keyframes fly-out-to-right {
+  to { -webkit-transform:translateX(100%); opacity:0; }
+}

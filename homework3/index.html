@@ -12,26 +12,26 @@
 </head>
 <body>
     
-	<div id="container">
 
-		<!-- the to-do list -->
-		<div class="column">
-			<ul id="todo-list">
-			    <li>Item #1 <a href="#" class="todo-list-remove">remove</a></li>
-			    <li>Item #2 <a href="#" class="todo-list-remove">remove</a></li>
-			</ul>
-		</div>
+	<div id="container">
+		<h1>To-do List</h1>
 
 		<!-- form to add an item to the list -->
-		<div class="column">
+		<section class="column">
 			<form id="todo-form">
-			    <label>Add an item</label><br/>
 			    <input name="todo-form-add" id="todo-form-add" type="text" placeholder="New item">
-			    <input type="submit">
+			    <input type="submit" value="+">
 			</form> 
-		</div>
+		</section>
+
+		<!-- the to-do list -->
+		<section class="column">
+			<ul id="todo-list"></ul>
+		</section>
 
 	</div>
 
+	<div id="loader">Loading...</div>
+	<ul class="backgrounds"></ul>
 </body>
 </html>
