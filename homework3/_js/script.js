@@ -1,10 +1,11 @@
-$(document).ready(function() {
+/*********************
+ * To-Do list items
+ * Encapsulated in closure
+ *********************/
+(function() {
 
-	/*********************
-	 * To-Do list items
-	 *********************/
-
-	var list = $("#todo-list"),
+	var listElem,
+		formElem,
 		listItems = [];
 
 	
@@ -34,7 +35,7 @@ $(document).ready(function() {
 		var elem = $("<li/>", {"class": "animate", text: value}).append(
 				$("<a/>", {"class": "todo-list-remove", "text":"x"})
 			);
-		list.append( elem );
+		listElem.append( elem );
 		
 		setTimeout(function() {
 			elem.removeClass("animate"); // Avoid animation after it was added
@@ -42,8 +43,8 @@ $(document).ready(function() {
 
 	};
 
-	$("#todo-form").on("submit", function(e) {
-		e.preventDefault();
+	var onNewItem = function(event) {
+		event.preventDefault();
 
 		var input = $(this).find("input[name=todo-form-add]"),
 			value = input.val();
@@ -53,10 +54,10 @@ $(document).ready(function() {
 			saveItem(value);
 			input.val("");
 		}
-	});
+	};
 
-	$("#todo-list").on("click", ".todo-list-remove", function(e){
-		e.preventDefault();
+	var onRemoveItem = function(event) {
+		event.preventDefault();
 		var elem = $(this).parent(); 
 		elem.addClass("removed");
 		removeItem(elem.index());
@@ -64,94 +65,145 @@ $(document).ready(function() {
 		setTimeout(function() {
 			elem.remove(); // Remove element after animation
 		}, 500);
-	});
+	};
 
-	loadItems();
+	this.initTodoList = function(listSelector, formSelector) {
+		listElem = $(listSelector).on("click", ".todo-list-remove", onRemoveItem);
+		formElem = $(formSelector).on("submit", onNewItem);
+		loadItems();
+	};
+
+})();
 
 
-	/********************
-	 * Background images
-	 ********************/
-	var slideShowDelay = 5000,
-		slideShowImgCount = 10;
+/********************
+ * Background images
+ * jQuery plugin style
+ * Could obviously be made more generic
+ ********************/
+(function($, window, document, undefined){
+	
 
-	var initPosition = function() {
-		displayLoader("Determining position...");
-		navigator.geolocation.getCurrentPosition(function(position) {
-			hideLoader();
-			fetchPhotos(position.coords.latitude, position.coords.longitude);
+	var BackgroundSlideshow = {
+		init: function(options, element) {
+			this.$elem = $(element);
+			
+			this.options = $.extend(true, {}, $.fn.backgroundSlideshow.options, options);
+			console.log(this.options)
+			this.$loader = $(this.options.loaderSelector);
+			this.getPosition();
+		},
+		getPosition: function() {
+			var self = this;
+			this.displayLoader("Determining position...");
+			navigator.geolocation.getCurrentPosition(function(position) {
+				self.hideLoader();
+				self.fetchPhotos(position.coords.latitude, position.coords.longitude);
+			});
+		},
+		fetchPhotos: function(lat, lng) {
+			this.displayLoader("Loading Flikr photos...");
+			var self = this,
+				params = $.extend({}, self.options.flickr_params, {
+					content_type: 1,
+					has_geo: 1,
+					lat: lat,
+					lon: lng,
+					per_page:self.options.img_count,
+				});
+
+			$.getJSON("https://api.flickr.com/services/rest/?method=flickr.photos.search&format=json&jsoncallback=?", params, function(data){
+				console.log("Response", data);
+
+				var imgUrls = [];
+				// Add all images
+				$.each(data.photos.photo, function(i,item){
+					var url = self.createPhotoUrl(item);
+					self.$elem.append( $('<'+self.options.item_type+'/>').css("background-image", "url("+url+")") );
+					
+					imgUrls.push(url);
+				});
+
+				// Preload and start slideshow
+				// TODO: Start slideshow with loaded photos as soon as the first one is ready
+				self.preloadImages(imgUrls, function() {
+					self.hideLoader();
+					$("body").css("background", "#FFF");
+					self.showNextBackground(0);
+				});
+			});
+		},
+
+		createPhotoUrl: function(data) {
+			return "https://farm"+data.farm+".staticflickr.com/"+data.server+"/"+data.id+"_"+data.secret+"_b.jpg";
+		},
+
+
+		showNextBackground: function(nextIndex) {
+			if (!nextIndex || nextIndex<0) nextIndex = 0;
+			this.$elem
+				.find(this.options.item_type+"."+this.options.active_class).removeClass( this.options.active_class ).end()
+				.find(this.options.item_type).eq(nextIndex).addClass( this.options.active_class );
+
+			nextIndex = (nextIndex+1) % this.$elem.find( this.options.item_type ).length;
+			setTimeout(this.showNextBackground.bind(this), this.options.delay, nextIndex);
+		},
+
+
+		// Callback function gets called after all images are preloaded
+		preloadImages: function(images, callback) {
+			var listCount = images.length;
+			$(images).each(function() {
+				$('<img>').attr({ src: this }).load(function() {
+					listCount--;
+					if (listCount === 0) { callback(); }
+				});
+			});
+		},
+		displayLoader: function(text) {
+			if (this.$loader)
+				this.$loader.text(text).slideDown();
+		},
+		hideLoader: function() {
+			if (this.$loader)
+				this.$loader.slideUp();
+		}
+	};
+
+	$.fn.backgroundSlideshow = function(options) {
+		//Here  - this - refers to jQuery object
+		return this.each(function() {
+			var slideshow = Object.create(BackgroundSlideshow);
+			slideshow.init(options, this);
+			$.data(this, 'backgroundSlideshow', slideshow); // Save reference to plugin object - under pluginName
 		});
 	};
 
-	var fetchPhotos = function(lat, lng) {
-		displayLoader("Loading Flikr photos...");
-		$.getJSON("https://api.flickr.com/services/rest/?method=flickr.photos.search&format=json&jsoncallback=?",
-		{
+	//Make options mutable - can be changed generally for all
+	$.fn.backgroundSlideshow.options = {
+		//Default options
+		delay: 5000,
+		img_count: 10,
+		item_type: "li",
+		active_class: "active",
+		loaderSelector: "#loader",
+		flickr_params: {
 			api_key: "d799d2402512761796750af8e2792479",
 			sort: "interestingness-desc",
 			tags: "nature",
 			accuracy: 6,
-			content_type: 1,
-			has_geo: 1,
-			lat: lat,
-			lon: lng,
 			radius: 15,
-			per_page:slideShowImgCount,
-		}, function(data){
-			console.log("Response", data);
-			//runBackgroundSlidshow(data.photos.photo);
-			var imgUrls = [];
-			$.each(data.photos.photo, function(i,item){
-				var url = createPhotoUrl(item);
-				$('<li/>').css("background-image", "url("+url+")").appendTo('.backgrounds');
-				
-				imgUrls.push(url);
-			});
-
-			preloadImages(imgUrls, function() {
-				hideLoader();
-				$("body").css("background", "#FFF");
-				fadeBackground(0);
-			});
-		});
+		}
 	};
-
-	var createPhotoUrl = function(data) {
-		return "https://farm"+data.farm+".staticflickr.com/"+data.server+"/"+data.id+"_"+data.secret+"_b.jpg";
-	};
+})(jQuery, window, document);
 
 
-	var fadeBackground = function(nextIndex) {
-		if (!nextIndex || nextIndex<0) nextIndex = 0;
-		$("ul.backgrounds")
-			.find("li.active").removeClass("active").end()
-			.find("li").eq(nextIndex).addClass('active');
 
-		nextIndex = (nextIndex+1) % $("ul.backgrounds li").length;
-		setTimeout(fadeBackground, slideShowDelay, nextIndex);
-	};
+$(document).ready(function() {
 
+	initTodoList("#todo-list", "#todo-form");
 
-	// Callback function gets called after all images are preloaded
-	var preloadImages = function(images, callback) {
-		listCount = images.length;
-		$(images).each(function() {
-			$('<img>').attr({ src: this }).load(function() {
-				listCount--;
-				if (listCount === 0) { callback(); }
-			});
-		});
-	};
-
-	var displayLoader = function(text) {
-		$("#loader").text(text).slideDown();
-	};
-
-	var hideLoader = function() {
-		$("#loader").slideUp();
-	};
+	$("ul.backgrounds").backgroundSlideshow({flickr_params: {tags: "city"}});
 	
-
-	initPosition();
 
 });
