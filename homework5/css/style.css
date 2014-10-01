@@ -73,16 +73,34 @@ input[type="text"]:focus {
 	box-shadow: none;
 }
 
+section {
+	padding:1em 80px;
+}
+
+.map-container {
+	height:500px;
+	width:55%;
+	float:left;
+	border: 4px #fff solid;
+	box-shadow: 0 0 5px -1px rgba(0, 0, 0, 1);
+	border-radius: 3px;
+}
+
+.table-container {
+	width:40%;
+	margin-right: 5%;
+	float:left;
+	border-radius: 3px;
+}
+
 /*** Table Styles **/
 table {
   background: white;
   border-collapse: collapse;
-  margin: auto;
-  max-width: 95%;
-  width:95%;
   padding:5px;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-  box-sizing: border-box;
+  float:left;
+  box-shadow: 0 0 5px -1px rgba(0, 0, 0, 1);
+  box-sizing:border-box;
 }
  
 th {
@@ -121,8 +139,11 @@ td {
 tr:nth-child(odd) td {
   background:#EBEBEB;
 }
- 
+
 tr:hover td {
+  background:#cecece;
+}
+tr.selected td, tr.selected:hover td {
   background:#7D8892;
   color:#FFFFFF;
 }
@@ -157,7 +178,6 @@ tr:last-child td:last-child {
 .ng-table th.sortable div:before {
 	border-top: 4px solid #FFF;
 }
-
 
 
 .loading-layer {
