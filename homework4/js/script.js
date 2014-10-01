@@ -14,7 +14,7 @@ controller('TableCtrl', function($scope, $http, $filter, ngTableParams) {
         counts: [],
         total: features.length, // length of data
         getData: function($defer, params) {
-            console.log("FEATURES", features);
+            //console.log("FEATURES", features);
             // use build-in angular filter
             var filteredData = params.filter() ? $filter('filter')(features, params.filter()) : features;
             var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : filteredData;
@@ -41,7 +41,7 @@ controller('TableCtrl', function($scope, $http, $filter, ngTableParams) {
     }
 
     function refreshData() {
-        $http.get('http://io.milowski.com/usgs/earthquakes/feed/v1.0/summary/all_day.geojson').
+        $http.get('http://io.milowski.com/usgs/earthquakes/feed/v1.0/summary/all_hour.geojson').
             success(function(data, status, headers, config) {
                 console.log("SUCCESS", data,status);
 
@@ -70,7 +70,6 @@ controller('TableCtrl', function($scope, $http, $filter, ngTableParams) {
                 scope.$watch(scope.isLoading, function (value)
                 {
                     elm.toggleClass('loading', value);
-                    console.log("Toggle loading", value);
                 });
             }
         };
