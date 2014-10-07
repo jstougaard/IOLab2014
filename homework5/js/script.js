@@ -1,6 +1,8 @@
 var app = angular.module('main', ['ngTable', "leaflet-directive"]).
 controller('EarthquakeCtrl', function($scope, $http, $filter, ngTableParams) {
 
+    var src = 'http://io.milowski.com/usgs/earthquakes/feed/v1.0/summary/all_hour.geojson';
+
     $scope.features = [];
 
     $scope.tableParams = new ngTableParams({
@@ -20,7 +22,6 @@ controller('EarthquakeCtrl', function($scope, $http, $filter, ngTableParams) {
             var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : filteredData;
             params.total(orderedData.length); // set total for recalc pagination
             $defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
-            console.log(orderedData);
         }
     });
 
@@ -42,7 +43,7 @@ controller('EarthquakeCtrl', function($scope, $http, $filter, ngTableParams) {
     }
 
     function refreshData() {
-        $http.get('http://io.milowski.com/usgs/earthquakes/feed/v1.0/summary/all_hour.geojson').
+        $http.get(src).
             success(function(data, status, headers, config) {
                 console.log("SUCCESS", data,status);
 
@@ -63,7 +64,8 @@ controller('EarthquakeCtrl', function($scope, $http, $filter, ngTableParams) {
      * TODO: Encapsulation
      **/
     angular.extend($scope, {
-        markers: [],
+        markers: {},
+        magMarkers: {},
         mapCenter: {},
         selectedFeature: null,
         defaults: {
@@ -86,7 +88,7 @@ controller('EarthquakeCtrl', function($scope, $http, $filter, ngTableParams) {
     $scope.$watch("selectedFeature", setMapCenter);
 
     $scope.$watch("features", function() {
-        var markers = {}, maxFeature;
+        var markers = {}, magMarkers={}, maxFeature;
         $scope.features.forEach(function(obj) {
             markers[obj.id] = {
                 lat: obj.lat,
@@ -96,10 +98,21 @@ controller('EarthquakeCtrl', function($scope, $http, $filter, ngTableParams) {
                 draggable: false
             };
 
+            magMarkers[obj.id] = {
+                type: "circle",
+                radius: obj.mag * 10000, // TODO: This isn't correct
+                stroke: false,
+                latlngs: {
+                    lat: obj.lat,
+                    lng: obj.lng
+                }
+            };
+
             if (!maxFeature || maxFeature.mag < obj.mag)
                 maxFeature = obj;
         });
         $scope.markers = markers;
+        $scope.magMarkers = magMarkers;
 
         if (!$scope.selectedFeature)
             $scope.selectedFeature = maxFeature;
