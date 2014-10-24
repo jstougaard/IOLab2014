@@ -1,0 +1,32 @@
+I have created a widget for the course webpage that runs as a Chrome Extension.
+The extension fetches all titles and due dates for homework and milestones using green turtle.
+It then determines which deadlines are closest and present this as the next homework and milestone.
+Additionally all upcoming deadlines are shown underneath.
+
+As the extension isn't exactly general-purpose, it will only run on the course website.
+
+Visibility of the summary can be toggled using the icon in the address bar
+
+A guide to installing the extension can be found here:
+https://developer.chrome.com/extensions/getstarted#unpacked
+
+A screenshot of the running extension has been bundled with the code if you do not wish to install the extension.
+
+The produced javascript (background page and content script) can be found in the src directory.
+
+
+Homework fetch with green turtle (see green-turle-examples.js):
+Title:  Get Setup! is due 09-04
+Title: Back to the Future with CSS3 is due 09-11
+Title: Scripting - To do? Or not TO DO?! is due 09-25
+Title: Accessing USGS Earthquake Data is due 10-02
+Title: Mapping Earthquakes is due 10-09
+Title: Triples in a Haystack is due 10-30 
+
+Milestones:
+Title: Your Pitches (P1) is due 09-16
+Title: Your Pitches (P1) is due 09-18
+Title: Your Pitches (P1) is due 09-16
+Title: Mockup (P2) is due 10-09
+Title: Information Design (P3) is due 10-30
+Title: Implementation Updates (P4) and Fire Fighting is due 11-25 
