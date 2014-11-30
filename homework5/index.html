@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script data-require="angular.js@*" data-semver="1.2.0-rc3-nonmin" src="http://code.angularjs.org/1.2.0-rc.3/angular.js"></script>
+    <script data-require="ng-table@*" data-semver="0.3.0" src="http://bazalt-cms.com/assets/ng-table/0.3.0/ng-table.js"></script>
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.js"></script>
+    <script src="js/angular-leaflet-directive.min.js"></script>
+    
+    <link data-require="bootstrap-css@*" data-semver="3.0.0" rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" />
+    <link data-require="ng-table@*" data-semver="0.3.0" rel="stylesheet" href="http://bazalt-cms.com/assets/ng-table/0.3.0/ng-table.css" />
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.css">
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="js/script.js"></script>
+</head>
+
+<body ng-app="main" ng-controller="EarthquakeCtrl">
+    <div class="loading-layer" data-loading></div>
+    <header>
+        <button ng-click="refresh()" class="refresh" title="Refresh data" data-loading><img src="css/icon_refresh.svg"/></button>
+        <h1>USGS Earthquake Data</h1>
+    </header>
+    
+    <section>
+        <div class="table-container">
+            <table ng-table="tableParams" show-filter="true">
+                <tr ng-repeat="obj in $data" ng-click="selectFeature(obj)" ng-class="{selected: obj.id == selectedFeature.id}">
+                    <td data-title="'Title'" sortable="title" filter="{ 'title': 'text'}">
+                        {{obj.title}}
+                    </td>
+                    <td data-title="'Time'" sortable="time">
+                        {{obj.time | date:'medium'}}
+                    </td>
+                    <td data-title="'More'">
+                       &gt; <a href="{{obj.url}}" title="Info" target="_blank">Info</a><br/>
+                       &gt; <a href="{{obj.detail}}" title="Data" target="_blank">Data</a>
+                    </td>   
+                </tr>
+            </table>
+        </div>
+        <div class="map-container">
+            <leaflet markers="markers" center="mapCenter" paths="magMarkers" height="100%" width="100%"></leaflet>
+        </div>
+    </section>
+</body>
+</html>

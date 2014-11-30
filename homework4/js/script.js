@@ -41,7 +41,7 @@ controller('TableCtrl', function($scope, $http, $filter, ngTableParams) {
     }
 
     function refreshData() {
-        $http.get('http://io.milowski.com/usgs/earthquakes/feed/v1.0/summary/all_hour.geojson').
+        $http.get('http://io.milowski.com/usgs/earthquakes/feed/v1.0/summary/all_day.geojson').
             success(function(data, status, headers, config) {
                 console.log("SUCCESS", data,status);
 
